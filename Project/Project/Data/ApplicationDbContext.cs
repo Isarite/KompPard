@@ -38,6 +38,12 @@ namespace Project.Data
                 .HasKey(k => new { k.CartId, k.ItemId });
             modelBuilder.Entity<OrderedServiceItem>()
                 .HasKey(k => new { k.CartId, k.ServiceId });
+            modelBuilder.Entity<Cart>()
+                .HasMany(o => o.OrderedServiceItems)
+                .WithOne(o => o.Cart);
+            modelBuilder.Entity<Cart>()
+                .HasMany(o => o.OrderedInventoryItems)
+                .WithOne(o => o.Cart);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
@@ -29,12 +30,15 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(InventoryItem item)
         {
-            _context.InventoryItems.Add(item);
-
+            await _context.InventoryItems.AddAsync(item);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-       
+
+        public async Task<IActionResult> Details(int id)
+        {
+            return View(await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id));
+        }
     }
 }

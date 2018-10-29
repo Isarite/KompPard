@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Project.Models;
 
 namespace Project
 {
@@ -37,7 +38,16 @@ namespace Project
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+                {
+                    o.Password.RequireDigit = false;
+                    o.Password.RequireLowercase = false;
+                    o.Password.RequireUppercase = false;
+                    o.Password.RequiredLength = 6;
+                    o.Password.RequireNonAlphanumeric = false;
+                }).AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

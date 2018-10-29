@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project.Models
@@ -14,5 +15,8 @@ namespace Project.Models
         public string UserId { get; set; }
 
         public ApplicationUser User { get; set; }
+
+        public virtual IEnumerable<OrderedInventoryItem> OrderedInventoryItems { get; set; }
+        public virtual IEnumerable<OrderedServiceItem> OrderedServiceItems { get; set; }
     }
 }

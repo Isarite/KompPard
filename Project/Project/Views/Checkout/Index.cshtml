@@ -1,0 +1,30 @@
+﻿@model Project.Models.Cart
+
+@if (Model == null || Model.TotalValue == 0)
+{
+    <h2>Cart is empty</h2>
+}
+else
+{
+    <br />
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderedInventoryItems)
+            {
+                <tr>
+                    <td>@item.InventoryItem.Name</td>
+                    <td>@item.InventoryItem.Price</td>
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-action="Continue" class="btn btn-block btn-success">Continue!</a>
+}

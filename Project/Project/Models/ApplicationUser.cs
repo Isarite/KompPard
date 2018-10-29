@@ -16,8 +16,6 @@ namespace Project.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public string Address { get; set; }
-
         // Subscribtion to the email
         public bool IsSubscribed { get; set; }
 
