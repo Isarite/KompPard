@@ -1,7 +1,7 @@
 ﻿@model Project.Models.Cart
 
 <div class="col-md-12">
-    <br/>
+    <br />
     <a asp-action="History" class="btn btn-block btn-info">History</a>
 </div>
 
@@ -27,6 +27,14 @@ else
                     <td>@item.InventoryItem.Name</td>
                     <td>@item.InventoryItem.Price</td>
                     <td>@item.Quantity</td>
+                </tr>
+            }
+            @foreach (var item in Model.OrderedServiceItems)
+            {
+                <tr>
+                    <td>@item.ServiceItem.Name</td>
+                    <td>@(item.ServiceItem.HourPrice * (item.EndDate - item.StartDate).Hours)</td>
+                    <td>@((item.EndDate - item.StartDate).Hours)</td>
                 </tr>
             }
         </tbody>

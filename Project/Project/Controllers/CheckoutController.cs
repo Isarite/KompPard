@@ -31,6 +31,7 @@ namespace Project.Controllers
                 .Include(c => c.OrderedInventoryItems)
                 .ThenInclude(c => c.InventoryItem)
                 .Include(c => c.OrderedServiceItems)
+                .ThenInclude(c => c.ServiceItem)
                 .SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
             return View(cart);
         }
@@ -59,8 +60,7 @@ namespace Project.Controllers
             else
                 item.Quantity += quantity;
 
-            cart.TotalValue = await _context.OrderedInventoryItems.Include(o => o.InventoryItem)
-                .Where(t => t.CartId == cart.Id).SumAsync(s => s.InventoryItem.Price * s.Quantity);
+            cart.TotalValue = await CalculatePrice(cart);
 
             await _context.SaveChangesAsync();
 
@@ -90,6 +90,49 @@ namespace Project.Controllers
                 .ThenInclude(c => c.OrderedServiceItems)
                 .ThenInclude(osi => osi.ServiceItem)
                 .Where(c => c.Cart.UserId == uid).ToListAsync());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddService(int id, DateTime startingDate, DateTime endingDate)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var cart = await _context.Carts.SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
+            if (cart == null)
+            {
+                cart = new Cart { Id = Guid.NewGuid(), IsFinal = false, LastEditDate = DateTime.Now, UserId = user.Id };
+                await _context.Carts.AddAsync(cart);
+            }
+
+            var item = await _context.OrderedServiceItems.SingleOrDefaultAsync(s => s.ServiceId == id);
+            if (item == null)
+                await _context.OrderedServiceItems.AddAsync(new OrderedServiceItem
+                {
+                    CartId = cart.Id,
+                    ServiceId = id,
+                    StartDate = startingDate > DateTime.Now ? startingDate : DateTime.Now,
+                    EndDate = endingDate
+                });
+            else
+            {
+                item.StartDate = startingDate > DateTime.Now ? startingDate : DateTime.Now;
+                item.EndDate = endingDate;
+            }
+
+            cart.TotalValue = await CalculatePrice(cart);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Services");
+        }
+
+        private async Task<decimal> CalculatePrice(Cart cart)
+        {
+            var invent = await _context.OrderedInventoryItems.Include(o => o.InventoryItem)
+                .Where(t => t.CartId == cart.Id).SumAsync(s => s.InventoryItem.Price * s.Quantity);
+            var service = await _context.OrderedServiceItems.Include(o => o.ServiceItem)
+                .Where(t => t.CartId == cart.Id).SumAsync(s => (decimal)(s.EndDate - s.StartDate).TotalHours * s.ServiceItem.HourDuration * s.ServiceItem.HourPrice);
+            return invent + service;
         }
     }
 }

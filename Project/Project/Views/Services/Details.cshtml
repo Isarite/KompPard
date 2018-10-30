@@ -1,0 +1,52 @@
+﻿@model Project.Models.ServiceItem
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ServiceItem</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HourDuration)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HourDuration)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HourPrice)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HourPrice)
+        </dd>
+    </dl>
+</div>
+<div>
+    <form method="post" action="@Url.Action("AddService", "Checkout")/@Model.Id">
+        <div class="form-group">
+            <label for="startingDate" class="">Starting date</label>
+            <input id="startingDate" class="form-control" type="datetime" name="startingDate" value="@DateTime.Now" @(Model.HourDuration == 0 ? "disabled" : "") />
+        </div>
+        <div class="form-group">
+            <label for="endingDate" class="">Ending date</label>
+            <input id="endingDate" class="form-control" type="datetime" name="endingDate" value="@DateTime.Now.AddDays(7)" @(Model.HourDuration == 0 ? "disabled" : "") />
+        </div>
+        <input type="submit" value="🛒" class="btn btn-block" />
+    </form>
+    <a asp-action="Index">Back to List</a>
+</div>

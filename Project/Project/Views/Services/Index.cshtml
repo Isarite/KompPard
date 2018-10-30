@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Project.Models.ServiceItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+    .table:hover {
+        cursor: pointer;
+    }
+</style>
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HourDuration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HourPrice)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="data-row" data-href="@Url.Action("Details")/@item.Id">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HourDuration)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HourPrice)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function ($) {
+            $(".data-row").click(function () {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+}
