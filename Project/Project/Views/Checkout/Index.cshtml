@@ -1,5 +1,10 @@
 ﻿@model Project.Models.Cart
 
+<div class="col-md-12">
+    <br/>
+    <a asp-action="History" class="btn btn-block btn-info">History</a>
+</div>
+
 @if (Model == null || Model.TotalValue == 0)
 {
     <h2>Cart is empty</h2>

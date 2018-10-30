@@ -11,6 +11,7 @@ using Project.ViewModels;
 
 namespace Project.Controllers
 {
+    [Authorize]
     public class CheckoutController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -22,7 +23,6 @@ namespace Project.Controllers
             _context = context;
         }
 
-        [Authorize]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -67,9 +67,29 @@ namespace Project.Controllers
             return RedirectToAction("Index", "Inventory");
         }
 
-        public IActionResult Continue()
+        public async Task<IActionResult> Continue()
         {
-            throw new NotImplementedException();
+            var user = await _userManager.GetUserAsync(User);
+
+            var cart = await _context.Carts
+                .Include(c => c.OrderedInventoryItems)
+                .ThenInclude(i => i.InventoryItem)
+                .SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
+
+            return View(new Invoice { Cart = cart });
+        }
+
+        public async Task<IActionResult> History()
+        {
+            var uid = _userManager.GetUserId(User);
+            return View(await _context.Invoices
+                .Include(i => i.Cart)
+                .ThenInclude(c => c.OrderedInventoryItems)
+                .ThenInclude(oii => oii.InventoryItem)
+                .Include(i => i.Cart)
+                .ThenInclude(c => c.OrderedServiceItems)
+                .ThenInclude(osi => osi.ServiceItem)
+                .Where(c => c.Cart.UserId == uid).ToListAsync());
         }
     }
 }

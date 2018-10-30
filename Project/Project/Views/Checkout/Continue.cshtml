@@ -1,149 +1,58 @@
-﻿@model Kodhier.ViewModels.ConfirmCheckoutViewModel
+﻿@model Invoice
 
 @{
-    ViewData["Title"] = Localizer["Continue"];
+    ViewData["Title"] = "Continue";
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="products">
-                <div class="modal-header">
-                    <h6 class="display-4">@Localizer["Cart"]</h6>
-                </div>
-                <br />
-                <p class="font-weight-bold lead ">@Localizer["Total:"] @(Model.Price) coins&trade;</p>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th style="width:30%; font-size: 10px;">@Localizer["Name"]</th>
-                            <th style="width:20%; font-size: 10px;">@Localizer["Size"] </th>
-                            <th style="width:20%; font-size: 10px;">@Localizer["Amount"] </th>
-                            <th style="width:20%; font-size: 10px;">@Localizer["Price"] </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.CheckoutList)
-                        {
-                            <tr>
-                                <td style="font-size: 10px;">@item.Name</td>
-                                <td style="font-size: 10px;">@item.Size</td>
-                                <td style="font-size: 10px;">@item.Quantity</td>
-                                <td style="font-size: 10px;">@(item.Price * item.Quantity)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="products">
-                <div class="modal-header">
-                    <h6 class="display-4">@Localizer["Delivery details"]</h6>
-                </div>
-                <br />
-                <div class="row">
-                    <div class="col-4">
-                        @* TODO: Fix validation *@
-                        <form asp-action="Continue" method="post" id="confrimCheckout">
-                            <div class="form-group">
-                                <div style="text-align: left"><label asp-for="ConfirmAddress">@Localizer["Address:"]</label></div>
-                                <input asp-for="ConfirmAddress" class="form-control" placeholder="@Localizer["Shipping address"]" />
-                                <span asp-validation-for="ConfirmAddress" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <div style="text-align: left"><label asp-for="PhoneNumber">@Localizer["Phone number:"]</label></div>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="@Localizer["Ex: +37061212345"]" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <div style="text-align: left"><label asp-for="Comment">@Localizer["Comment:"]</label></div>
-                                <input asp-for="Comment" class="form-control" placeholder="@Localizer["Ex: Door code"]" />
-                                <span asp-validation-for="Comment" class="text-danger"></span>
-                            </div>
-                            <div style="position: absolute; bottom: 5%; width: 90%">
-                                <input type="submit" value="@Localizer["Place order"]" class="btn btn-success btn-block" style="margin-top: 5px" />
-                                <a asp-action="Index" class="btn btn-warning btn-block" style="margin-top: 5px">@Localizer["Return"]</a>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-8">
-                        <div id="map"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<br />
+<div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Cart.OrderedInventoryItems)
+        {
+            <tr>
+                <td>@item.InventoryItem.Name</td>
+                <td>@item.InventoryItem.Price</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
 
+
+<div class="container">
+    <div class="col-md-4 col-md-offset-4">
+        <form asp-action="Continue" method="post" id="confrimCheckout">
+            <div class="form-group">
+                <div style="text-align: left"><label asp-for="DeliveryAddress">Address:</label></div>
+                <input asp-for="DeliveryAddress" class="form-control" placeholder="Delivery address" />
+                <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div style="text-align: left"><label asp-for="PhoneNumber">Phone number:</label></div>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Ex: +37061212345" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div style="text-align: left"><label asp-for="Email">Email:</label></div>
+                <input asp-for="Email" class="form-control" placeholder="Notification email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div>
+                <input type="submit" value="Place order" class="btn btn-success btn-block" style="margin-top: 5px" />
+                <a asp-action="Index" class="btn btn-warning btn-block" style="margin-top: 5px">Return</a>
+            </div>
+        </form>
+    </div>
+</div>
 @section Scripts {
-    <script>
-        $('#confrimCheckout').on('keyup keypress',
-            function (e) {
-                var keyCode = e.keyCode || e.which;
-                if (keyCode === 13) {
-                    e.preventDefault();
-                    return false;
-                }
-                return true;
-            });
-    </script>
-    <script>
-        var autocomplete;
-        var map;
-        var marker;
-
-        function updateMap() {
-            if (marker != null)
-                marker.setVisible(false);
-
-            var place = autocomplete.getPlace();
-            if (!place.geometry) {
-                // User entered the name of a Place that was not suggested and
-                // pressed the Enter key, or the Place Details request failed.
-                marker.setVisible(false);
-                return;
-            }
-
-            // If the place has a geometry, then present it on a map.
-            if (place.geometry.viewport) {
-                map.fitBounds(place.geometry.viewport);
-            } else {
-                map.setCenter(place.geometry.location);
-                map.setZoom(17); // Why 17? Because it looks good.
-            }
-            marker.setPosition(place.geometry.location);
-            marker.setVisible(true);
-        }
-
-        function initMap() {
-            map = new window.google.maps.Map(document.getElementById('map'),
-                {
-                    center: { lat: 54.9049311, lng: 23.9544675 },
-                    zoom: 13
-                });
-            marker = new window.google.maps.Marker({
-                map: map
-            });
-
-            autocomplete = new window.google.maps.places.Autocomplete(document.getElementById('ConfirmAddress'),
-                { componentRestrictions: { country: "lt" } });
-            autocomplete.bindTo('bounds', map);
-
-            $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?address=' +
-                $('#ConfirmAddress').val() + '&sensor=false', null,
-                function (data) {
-                    var p = data.results[0].geometry.location;
-                    var latlng = new window.google.maps.LatLng(p.lat, p.lng);
-                    map.setCenter(latlng);
-                    map.setZoom(17);
-                    marker.setPosition(latlng);
-                    marker.setVisible(true);
-                });
-            autocomplete.addListener('place_changed', updateMap);
-        }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzAKx9JC4eS_8qbGX9iz5ZwRfJ1u8Zf4o&libraries=places&callback=initMap" async defer></script>
-
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
