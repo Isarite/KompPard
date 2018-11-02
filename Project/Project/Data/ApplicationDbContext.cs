@@ -27,6 +27,7 @@ namespace Project.Data
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Feedback> Feedback { get; set; }
 
+        public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

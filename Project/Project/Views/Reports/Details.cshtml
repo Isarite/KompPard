@@ -1,0 +1,13 @@
+﻿@model Project.Models.Report
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<div class="container">
+    @Model.ContentsHtml
+</div>
