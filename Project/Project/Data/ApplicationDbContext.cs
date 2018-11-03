@@ -7,7 +7,7 @@ using Project.Models;
 
 namespace Project.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<InventoryItem> InventoryItems { get; set; }
         public DbSet<ServiceItem> ServiceItems { get; set; }

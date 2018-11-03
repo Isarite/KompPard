@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace Project.Controllers
     public class ServicesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManger;
 
-        public ServicesController(ApplicationDbContext context)
+        public ServicesController(ApplicationDbContext context, UserManager<ApplicationUser> userManger)
         {
             _context = context;
+            _userManger = userManger;
         }
 
         // GET: ServiceItems
@@ -148,6 +151,14 @@ namespace Project.Controllers
         private bool ServiceItemExists(int id)
         {
             return _context.ServiceItems.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> ActiveServices()
+        {
+            var user = await _userManger.GetUserAsync(User);
+            var services = _context.OrderedServiceItems.Include(c => c.Cart).Include(c => c.ServiceItem).Where(si => si.Cart.UserId == user.Id)
+                .Where(si => si.EndDate < DateTime.Now && si.StartDate > DateTime.Now);
+            return View(services);
         }
     }
 }

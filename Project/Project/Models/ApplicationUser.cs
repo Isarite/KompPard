@@ -17,7 +17,9 @@ namespace Project.Models
         public string LastName { get; set; }
 
         // Subscribtion to the email
-        public bool IsSubscribed { get; set; }
+        public bool Subscribed { get; set; }
+
+        public bool AccountValidated { get; set; }
 
         [ForeignKey("Country")]
         public int CountryId { get; set; }

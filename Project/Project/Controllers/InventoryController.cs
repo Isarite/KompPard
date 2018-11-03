@@ -40,5 +40,15 @@ namespace Project.Controllers
         {
             return View(await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id));
         }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            return View(await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id));
+        }
+
+        public IActionResult WriteReview(int id)
+        {
+            return View();
+        }
     }
 }

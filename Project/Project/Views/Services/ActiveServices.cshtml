@@ -1,0 +1,22 @@
+﻿@model IEnumerable<OrderedServiceItem>
+@{
+    ViewData["Title"] = "Active Services";
+}
+
+<h2>Active Services</h2>
+
+<table class="table table-hover">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>End date</th>
+    </tr>
+    @foreach (var service in Model)
+    {
+        <tr>
+            <td>@service.ServiceItem.Name</td>
+            <td>@service.ServiceItem.Description</td>
+            <td>@service.EndDate</td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,15 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = $"{ViewData["SubTitle"]} Management";
+
+    
+}
+
+<div class="col-md-4">
+    <a asp-controller="Manage" asp-action="Manage">Manage</a>
+</div>
+<div class="col-md-4">
+    <a asp-controller="Checkout" asp-action="History">History</a>
+</div>
+<br/>
+@RenderBody()

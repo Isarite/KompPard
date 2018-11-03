@@ -51,7 +51,7 @@ namespace Project.Controllers
 
             var user = new ApplicationUser
             {
-                UserName = $"{model.Email}",
+                UserName = model.Email,
                 Email = model.Email,
                 CountryId = model.CountryId,
                 FirstName = model.FirstName,
