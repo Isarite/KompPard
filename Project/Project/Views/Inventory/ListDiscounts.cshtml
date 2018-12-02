@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Discount>
 
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = "View Discounts";
 }
 
 <style>
@@ -29,7 +29,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr class="data-row" data-href="@Url.Action("DiscountDetails")/@item.Id">
+            <tr class="data-row">
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>

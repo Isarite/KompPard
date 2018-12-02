@@ -79,7 +79,8 @@ namespace Project.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            return View(await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id));
+            var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id);
+            return View(item);
         }
 
         public IActionResult WriteReview(int id)
