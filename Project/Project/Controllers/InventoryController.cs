@@ -18,20 +18,10 @@ namespace Project.Controllers
             _context = context;
         }
 
-
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string text)
         {
-            return View(await _context.InventoryItems.ToListAsync());
-        }
-
-        public async Task<IActionResult> ListDiscounts()
-        {
-            return View(await _context.Discounts.ToListAsync());
-        }
-
-        [ActionName("Index")]
-        public async Task<IActionResult> Search(string text)
-        {
+            if (string.IsNullOrEmpty(text))
+                return View(await _context.InventoryItems.ToListAsync());
             var items = _context.InventoryItems.Where(p => p.Name.Contains(text) || p.Description.Contains(text) || p.Category.Name.Contains(text));
             return View(await items.ToListAsync());
         }
