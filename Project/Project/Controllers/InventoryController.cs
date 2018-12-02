@@ -71,6 +71,10 @@ namespace Project.Controllers
             return View(await _context.Discounts.SingleOrDefaultAsync(d => d.Id == id));
         }
 
+        public async Task<IActionResult> ListDiscounts() {
+       
+                return View(await _context.Discounts.ToListAsync());
+        }
 
 
         public async Task<IActionResult> Edit(int id)
