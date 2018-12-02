@@ -25,8 +25,8 @@ namespace Project.Controllers
 
         public async Task<IActionResult> Search(string text)
         {
-            var items =  _context.InventoryItems.Where(p => p.Name.Contains(text) || p.Description.Contains(text)
-            || p.Category.Name.Contains(text));
+            var items = _context.InventoryItems.Where(p => p.Name.Contains(text) || p.Description.Contains(text)
+           || p.Category.Name.Contains(text));
             return View(await items.ToListAsync());
         }
 
