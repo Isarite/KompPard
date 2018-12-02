@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,14 @@ namespace Project.Controllers
         {
             return View(await _context.InventoryItems.ToListAsync());
         }
+
+        public async Task<IActionResult> Search(string text)
+        {
+            var items =  _context.InventoryItems.Where(p => p.Name.Contains(text) || p.Description.Contains(text)
+            || p.Category.Name.Contains(text));
+            return View(await items.ToListAsync());
+        }
+
 
         public IActionResult Create()
         {
