@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
@@ -85,12 +87,46 @@ namespace Project.Controllers
                 return View(await _context.Discounts.ToListAsync());
         }
 
-
         public async Task<IActionResult> Edit(int id)
         {
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id);
+            //ViewBag.DiscountId = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
+            var list = _context.Discounts.ToList();
+            ViewBag.DiscountId = new List<SelectListItem>();
+            foreach (var discount in list)
+            {
+                ViewBag.DiscountId.Add(new SelectListItem { Value = discount.Id.ToString(), Text = discount.Description + discount.Amount });
+            }
+
+            var catList = _context.InventoryItemCategories.ToList();
+            ViewBag.CategoryId = new List<SelectListItem>();
+            foreach (var cat in catList)
+            {
+                ViewBag.DiscountId.Add(new SelectListItem { Value = cat.Id.ToString(), Text = cat.Name });
+            }
             return View(item);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int Id, string Name, decimal Price, string Description, string ImgPath, int Stock, int DiscountId, int CategoryId)
+        {
+            var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == Id);
+            item.Name = Name;
+            item.Price = Price;
+            item.Description = Description;
+            item.ImgPath = ImgPath;
+            item.Stock = Stock;
+            item.CategoryId = CategoryId;
+            //var connection = new MM_InventoryItem_Category();
+            //connection.InventoryItemId = Id;
+            //connection.CategoryId = CategoryId;
+            //var toDelete = await _context.MmInventoryItemCategories.SingleOrDefaultAsync(i => i.InventoryItemId == Id);
+            //_context.MmInventoryItemCategories.Remove(toDelete);
+            //_context.MmInventoryItemCategories.Add(connection);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
 
         public IActionResult WriteReview(int id)
         {
