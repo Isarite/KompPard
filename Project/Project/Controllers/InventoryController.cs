@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +59,15 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> WriteReview(Feedback review)
         {
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            review.UserId = identity;
             await _context.Feedback.AddAsync(review);
             await _context.SaveChangesAsync();
             var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == review.ItemId);
             var stars = _context.Feedback.Where(c => c.ItemId == item.Id).Average(d => d.Rating);
-            item.Rating = stars;
+            item.Rating = stars;           
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(ListDiscounts));
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
@@ -91,6 +94,12 @@ namespace Project.Controllers
 
         public IActionResult WriteReview(int id)
         {
+            //Gets user ID
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //checks if user has bought that item before
+            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
+            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
+            ViewBag.BoughtItem = boughtItems.Contains(id);
             return View();
         }
     }
