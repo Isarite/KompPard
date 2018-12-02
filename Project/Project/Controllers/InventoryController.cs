@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Project.Controllers
 {
@@ -29,10 +31,8 @@ namespace Project.Controllers
             return View(await items.ToListAsync());
         }
 
-
         public IActionResult Create()
         {
-            //Viewbag.DiscountId =
             return View();
         }
 
