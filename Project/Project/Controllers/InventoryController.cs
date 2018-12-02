@@ -29,6 +29,7 @@ namespace Project.Controllers
 
         public IActionResult Create()
         {
+            //Viewbag.DiscountId =
             return View();
         }
 
@@ -41,12 +42,17 @@ namespace Project.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult CreateDiscount()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateDiscount(Discount item)
         {
             await _context.Discounts.AddAsync(item);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(ListDiscounts));
+            return View(nameof(ListDiscounts));
         }
 
         [HttpPost]
