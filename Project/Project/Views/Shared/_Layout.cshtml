@@ -5,36 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - E</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Project</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin-top: -50px; margin-bottom: 10px">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">Project E</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navdata">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navdata">
+            <div class="mr-auto">
+                <ul class="nav navbar-nav">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="Index">Invenotory</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Services" asp-action="Index">Services</a></li>
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                    }
+                </ul>
             </div>
-            <div class="navbar-collapse collapse">
-                <div class="">
-                    <ul class="navbar-left nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a asp-area="" asp-controller="Inventory" asp-action="Index">Invenotory</a></li>
-                        <li><a asp-area="" asp-controller="Services" asp-action="Index">Services</a></li>
-                        @if (User.IsInRole("Manager"))
-                        {
-                            <li><a asp-area="" asp-controller="Reports" asp-action="Index">Reports</a></li>
-                        }
-                    </ul>
-                </div>
-                <div class="navbar-right">
-                    <partial name="_LoginPartial" />
-                </div>
+            <div class="ml-auto">
+                <partial name="_LoginPartial"/>
             </div>
         </div>
     </nav>
@@ -49,10 +42,9 @@
         </footer>
     </div>
 
-    <style></style>
-
-    <script src="~/lib/jquery/dist/jquery.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)
