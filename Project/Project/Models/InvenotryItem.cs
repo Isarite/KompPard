@@ -20,7 +20,7 @@ namespace Project.Models
 
         // Rating of the item 1-100. Updates on create of new review
         [DefaultValue("true")]
-        public int Rating { get; set; }
+        public double Rating { get; set; }
 
         [ForeignKey("Discount")]
         public int? DiscountId { get; set; }

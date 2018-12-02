@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,11 @@ namespace Project.Controllers
             return View(await _context.InventoryItems.ToListAsync());
         }
 
+        public async Task<IActionResult> ListDiscounts()
+        {
+            return View(await _context.Discounts.ToListAsync());
+        }
+
         public async Task<IActionResult> Search(string text)
         {
             var items =  _context.InventoryItems.Where(p => p.Name.Contains(text) || p.Description.Contains(text)
@@ -45,10 +51,37 @@ namespace Project.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateDiscount(Discount item)
+        {
+            await _context.Discounts.AddAsync(item);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ListDiscounts));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> WriteReview(Feedback review)
+        {
+            await _context.Feedback.AddAsync(review);
+            await _context.SaveChangesAsync();
+            var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == review.ItemId);
+            var stars = _context.Feedback.Where(c => c.ItemId == item.Id).Average(d => d.Rating);
+            item.Rating = stars;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ListDiscounts));
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             return View(await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id));
         }
+
+        public async Task<IActionResult> DiscountDetails(int id)
+        {
+            return View(await _context.Discounts.SingleOrDefaultAsync(d => d.Id == id));
+        }
+
+
 
         public async Task<IActionResult> Edit(int id)
         {

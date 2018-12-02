@@ -18,9 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Inventory\ListDiscounts.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap.css">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-
 </Project>
