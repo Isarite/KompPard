@@ -27,6 +27,12 @@
                     {
                         <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListDiscounts">Discounts</a></li>
                     }
+                        <form asp-controller="Inventory" asp-action="Index">
+                            <p>
+                                Paieška: <input type="text" name="text">
+                                <input type="submit" value="Filter" />
+                            </p>
+                        </form>
                 </ul>
             </div>
             <div class="ml-auto">

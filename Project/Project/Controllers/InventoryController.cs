@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Project.Controllers
 {
@@ -26,10 +28,8 @@ namespace Project.Controllers
             return View(await items.ToListAsync());
         }
 
-
         public IActionResult Create()
         {
-            //Viewbag.DiscountId =
             return View();
         }
 
@@ -86,8 +86,31 @@ namespace Project.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id);
+            //ViewBag.DiscountId = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
+            var list = _context.Discounts.ToList();
+            ViewBag.DiscountId = new List<SelectListItem>();
+            foreach (var discount in list)
+            {
+                ViewBag.DiscountId.Add(new SelectListItem { Value = discount.Id.ToString(), Text = discount.Description + discount.Amount});
+            }
             return View(item);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int Id, string Name, decimal Price, string Description, string ImgPath, int Stock, int DiscountId)
+        {
+            var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == Id);
+            item.Name = Name;
+            item.Price = Price;
+            item.Description = Description;
+            item.ImgPath = ImgPath;
+            item.Stock = Stock;
+            //item.DiscountId = DiscountId;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         public IActionResult WriteReview(int id)
         {
