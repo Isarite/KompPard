@@ -50,6 +50,8 @@ namespace Project.Controllers
             return View();
         }
 
+
+
         public IActionResult CreateCategory()
         {
             return View();
@@ -61,6 +63,18 @@ namespace Project.Controllers
             await _context.Discounts.AddAsync(item);
             await _context.SaveChangesAsync();
             return View(nameof(ListDiscounts));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignDiscounts(int DiscountId, IEnumerable<int> confirmation)
+        {
+            var items = _context.InventoryItems.Where(c => confirmation.Contains(c.Id));
+            foreach(var item in items)
+            {
+                item.DiscountId = DiscountId;
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ListDiscounts));
         }
 
         [HttpPost]
@@ -93,7 +107,10 @@ namespace Project.Controllers
             var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
             var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
             ViewBag.BoughtItem = boughtItems.Contains(id);
-            return View(await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id));
+            var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id);
+            ViewBag.discount = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
+
+            return View(item);
         }
 
         public async Task<IActionResult> DiscountDetails(int id)
@@ -104,6 +121,19 @@ namespace Project.Controllers
         public async Task<IActionResult> ListDiscounts() {
        
                 return View(await _context.Discounts.ToListAsync());
+        }
+
+        public async Task<IActionResult> AssignDiscounts(int id)
+        {
+            ViewBag.DiscountId = id;
+            ViewBag.index = 0;
+            var items = await _context.InventoryItems.ToListAsync();
+            ViewBag.Discounts = new List<bool>();
+            foreach(var item in items)
+            {
+                ViewBag.Discounts.Add(id == item.DiscountId);
+            }
+            return View(items);
         }
 
         public async Task<IActionResult> ListCategories()
