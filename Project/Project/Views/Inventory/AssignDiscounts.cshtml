@@ -1,15 +1,22 @@
 ﻿@model IEnumerable<InventoryItem>
+@{
+    ViewData["Title"] = "Assign Discounts";
+}
+
+<h2>Assign</h2>
+
+<h4>Discounts</h4>
 
 <form asp-action="AssignDiscounts" asp-controller="Inventory">
-    <
+
     <input type="hidden" value="@ViewBag.DiscountId" name="DiscountId" />
     <ul>
         @foreach (var item in Model)
         {
             <li>
-                <input type="checkbox" name="confirmation" value="@item.Id"/>
+                <input type="checkbox" name="confirmation" value="@item.Id" />
                 <label asp-for="@item.Id">@item.Name</label>
-                <input type="hidden" asp-for="@item" name="items"/>
+                <input type="hidden" asp-for="@item" name="items" />
                 <input type="hidden" asp-for="@item.Name" />
             </li>
         }

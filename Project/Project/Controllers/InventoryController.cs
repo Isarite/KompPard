@@ -39,6 +39,8 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(InventoryItem item)
         {
+            if(!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             await _context.InventoryItems.AddAsync(item);
             await _context.SaveChangesAsync();
 
@@ -47,6 +49,8 @@ namespace Project.Controllers
 
         public IActionResult CreateDiscount()
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             return View();
         }
 
@@ -54,12 +58,16 @@ namespace Project.Controllers
 
         public IActionResult CreateCategory()
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateDiscount(Discount item)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             await _context.Discounts.AddAsync(item);
             await _context.SaveChangesAsync();
             return View(nameof(ListDiscounts));
@@ -68,6 +76,8 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignDiscounts(int DiscountId, IEnumerable<int> confirmation)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             var items = _context.InventoryItems.Where(c => confirmation.Contains(c.Id));
             foreach(var item in items)
             {
@@ -80,6 +90,8 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory(InventoryItemCategory item)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             await _context.InventoryItemCategories.AddAsync(item);
             await _context.SaveChangesAsync();
             return View(nameof(ListCategories));
@@ -119,12 +131,15 @@ namespace Project.Controllers
         }
 
         public async Task<IActionResult> ListDiscounts() {
-       
-                return View(await _context.Discounts.ToListAsync());
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
+            return View(await _context.Discounts.ToListAsync());
         }
 
         public async Task<IActionResult> AssignDiscounts(int id)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             ViewBag.DiscountId = id;
             ViewBag.index = 0;
             var items = await _context.InventoryItems.ToListAsync();
@@ -138,12 +153,16 @@ namespace Project.Controllers
 
         public async Task<IActionResult> ListCategories()
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
 
             return View(await _context.InventoryItemCategories.ToListAsync());
         }
 
         public async Task<IActionResult> Edit(int id)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id);
             //ViewBag.DiscountId = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
             var list = _context.Discounts.ToList();
@@ -165,6 +184,8 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int Id, string Name, decimal Price, string Description, string ImgPath, int Stock, int DiscountId, int CategoryId)
         {
+            if (!User.IsInRole("Manager"))
+                RedirectToAction(nameof(Index));
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == Id);
             item.Name = Name;
             item.Price = Price;
@@ -185,6 +206,14 @@ namespace Project.Controllers
 
         public IActionResult WriteReview(int id)
         {
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //checks if user has bought that item before
+            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
+            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
+            if(!boughtItems.Contains(id))
+                return RedirectToAction(nameof(Index));
+            ViewBag.id = id;
+            ViewBag.UserId = identity;
             return View();
         }
     }
