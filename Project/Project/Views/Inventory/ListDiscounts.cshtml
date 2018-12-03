@@ -37,9 +37,22 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Amount)
                     </td>
+                    <td>
+                        <a href="@Url.Action("AssignDiscounts")/@Html.DisplayFor(model => item.Id)" class="btn btn-primary">Assign</a>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function ($) {
+                $(".data-row").click(function () {
+                    window.location = $(this).data("href");
+                });
+            });
+        </script>
+    }
 }
 
