@@ -50,12 +50,25 @@ namespace Project.Controllers
             return View();
         }
 
+        public IActionResult CreateCategory()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateDiscount(Discount item)
         {
             await _context.Discounts.AddAsync(item);
             await _context.SaveChangesAsync();
             return View(nameof(ListDiscounts));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(InventoryItemCategory item)
+        {
+            await _context.InventoryItemCategories.AddAsync(item);
+            await _context.SaveChangesAsync();
+            return View(nameof(ListCategories));
         }
 
         [HttpPost]
@@ -74,6 +87,12 @@ namespace Project.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            //Gets user ID
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //checks if user has bought that item before
+            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
+            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
+            ViewBag.BoughtItem = boughtItems.Contains(id);
             return View(await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id));
         }
 
@@ -85,6 +104,12 @@ namespace Project.Controllers
         public async Task<IActionResult> ListDiscounts() {
        
                 return View(await _context.Discounts.ToListAsync());
+        }
+
+        public async Task<IActionResult> ListCategories()
+        {
+
+            return View(await _context.InventoryItemCategories.ToListAsync());
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -130,12 +155,6 @@ namespace Project.Controllers
 
         public IActionResult WriteReview(int id)
         {
-            //Gets user ID
-            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //checks if user has bought that item before
-            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
-            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
-            ViewBag.BoughtItem = boughtItems.Contains(id);
             return View();
         }
     }
