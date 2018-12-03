@@ -73,8 +73,7 @@
     {
         <a href="@Url.Action("Edit")/@Model.Id">Edit</a>
     }
-    @if (ViewBag.BoughtItem)
+    @if (ViewBag.BoughtItem) {
     <a href="@Url.Action("WriteReview")/@Model.Id">Write review</a>
-    {
     }
     </div>

@@ -27,15 +27,19 @@
                     {
                         <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListDiscounts">Discounts</a></li>
                     }
-                        <form asp-controller="Inventory" asp-action="Index">
-                            <p>
-                                Paieška: <input type="text" name="text">
-                                <input type="submit" value="Filter" />
-                            </p>
-                        </form>
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListCategories">Categories</a></li>
+                    }
                 </ul>
             </div>
             <div class="ml-auto">
+                <form asp-controller="Inventory" asp-action="Index">
+                    <p>
+                        <input type="text" name="text">
+                        <input type="submit" value="Ieškoti" />
+                    </p>
+                </form>
                 <partial name="_LoginPartial" />
             </div>
         </div>
