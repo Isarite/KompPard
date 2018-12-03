@@ -118,5 +118,10 @@ namespace Project.Controllers
         {
             throw new System.NotImplementedException();
         }
+
+        public string GetUserId()
+        {
+            return _userManager.GetUserId(User);
+        }
     }
 }
