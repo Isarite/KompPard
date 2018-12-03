@@ -3,41 +3,43 @@
 @{
     ViewData["Title"] = "View Discounts";
 }
-
-<style>
-    .table:hover {
-        cursor: pointer;
-    }
-</style>
-
-<h2>View</h2>
-
-<p>
-    <a asp-action="CreateDiscount">Create New</a>
-</p>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr class="data-row">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Amount)
-                </td>
-            </tr>
+@if (User.IsInRole("Manager"))
+{
+    <style>
+        .table:hover {
+            cursor: pointer;
         }
-    </tbody>
-</table>
+    </style>
+
+    <h2>View</h2>
+
+    <p>
+        <a asp-action="CreateDiscount">Create New</a>
+    </p>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="data-row">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
