@@ -8,10 +8,10 @@ namespace Project.Models
         [ForeignKey("InventoryItem")]
         public int InventoryItemId { get; set; }
 
-        [ForeignKey("User")]
-        public string UserId { get; set; }
+        [ForeignKey("InventoryItemCategory")]
+        public int CategoryId { get; set; }
 
         public virtual InventoryItem InventoryItem { get; set; }
-        public virtual ApplicationUser User { get; set; }
+        public virtual InventoryItemCategory InventoryItemCategory { get; set; }
     }
 }

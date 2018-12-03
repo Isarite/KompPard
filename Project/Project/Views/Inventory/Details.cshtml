@@ -69,10 +69,12 @@
     </form>
     <a asp-action="Index">Back to List</a>
 </div>
-<div>
     @if (User.IsInRole("Manager"))
     {
         <a href="@Url.Action("Edit")/@Model.Id">Edit</a> 
     }
+    @if (ViewBag.BoughtItem)
     <a href="@Url.Action("WriteReview")/@Model.Id">Write review</a>
-</div>
+    {
+    }
+    </div>

@@ -48,6 +48,7 @@ namespace Project.Controllers
                 await _context.Carts.AddAsync(cart);
             }
 
+            // Try to obtain the item, if was previously requested, only to change number of items ordered.
             var item = await _context.OrderedInventoryItems.SingleOrDefaultAsync(s => s.ItemId == id);
             if (item == null)
                 await _context.OrderedInventoryItems.AddAsync(new OrderedInventoryItem
@@ -59,7 +60,8 @@ namespace Project.Controllers
                 });
             else
                 item.Quantity += quantity;
-
+            await _context.SaveChangesAsync();
+            // Recalculates the cart price once.
             cart.TotalValue = await CalculatePrice(cart);
 
             await _context.SaveChangesAsync();
@@ -133,6 +135,30 @@ namespace Project.Controllers
             var service = await _context.OrderedServiceItems.Include(o => o.ServiceItem)
                 .Where(t => t.CartId == cart.Id).SumAsync(s => (decimal)(s.EndDate - s.StartDate).TotalHours * s.ServiceItem.HourDuration * s.ServiceItem.HourPrice);
             return invent + service;
+        }
+
+        public async Task<IActionResult> ChangeAmount(int? itemId, Guid? cartId, int quantity)
+        {
+            // If passed data is valid
+            if (itemId != null && cartId != null && quantity >= 0 && quantity < 100)
+            {
+                var cartItem = await _context.OrderedInventoryItems.Include(c => c.Cart).SingleAsync(o => o.CartId == cartId && o.ItemId == itemId);
+                var cart = cartItem.Cart;
+                if (quantity == 0)
+                {
+                    _context.Remove(cartItem);
+                }
+                else
+                {
+                    cartItem.Quantity = quantity;
+                }
+                _context.SaveChanges();
+                cartItem.Cart.TotalValue = await CalculatePrice(cartItem.Cart);
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

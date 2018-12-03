@@ -9,30 +9,39 @@ else
     <br />
     <table class="table table-striped">
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-            </tr>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Comment</th>
+            <th>Quantity</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.OrderedInventoryItems)
-            {
-                <tr>
-                    <td>@item.InventoryItem.Name</td>
-                    <td>@item.InventoryItem.Price</td>
-                    <td>@item.Quantity</td>
-                </tr>
-            }
-            @foreach (var item in Model.OrderedServiceItems)
-            {
-                <tr>
-                    <td>@item.ServiceItem.Name</td>
-                    <td>@(item.ServiceItem.HourPrice * (item.EndDate - item.StartDate).Hours)</td>
-                    <td>@((item.EndDate - item.StartDate).Hours)</td>
-                </tr>
-            }
+        @foreach (var item in Model.OrderedInventoryItems)
+        {
+            <tr>
+                <td>@item.InventoryItem.Name</td>
+                <td>@item.InventoryItem.Price</td>
+                <td>@item.Comment</td>
+                <td>
+                    <form asp-action="ChangeAmount">
+                        <input class="form-control" type="number" min="1" max="100" name="quantity" value="@item.Quantity" onblur="submit()"/>
+                        <input type="hidden" name="itemid" value="@item.ItemId" />
+                        <input type="hidden" name="cartid" value="@item.CartId" />
+                    </form>
+                </td>
+            </tr>
+        }
+        @foreach (var item in Model.OrderedServiceItems)
+        {
+            <tr>
+                <td>@item.ServiceItem.Name</td>
+                <td>@(item.ServiceItem.HourPrice * (item.EndDate - item.StartDate).Hours)</td>
+                <td>@((item.EndDate - item.StartDate).Hours)</td>
+            </tr>
+        }
         </tbody>
     </table>
+    <p>Total price: @Model.TotalValue</p>
     <a asp-action="Continue" class="btn btn-block btn-success">Continue!</a>
 }

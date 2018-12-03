@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
@@ -58,13 +61,15 @@ namespace Project.Controllers
         [HttpPost]
         public async Task<IActionResult> WriteReview(Feedback review)
         {
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            review.UserId = identity;
             await _context.Feedback.AddAsync(review);
             await _context.SaveChangesAsync();
             var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == review.ItemId);
             var stars = _context.Feedback.Where(c => c.ItemId == item.Id).Average(d => d.Rating);
-            item.Rating = stars;
+            item.Rating = stars;           
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(ListDiscounts));
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
@@ -82,7 +87,6 @@ namespace Project.Controllers
                 return View(await _context.Discounts.ToListAsync());
         }
 
-
         public async Task<IActionResult> Edit(int id)
         {
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == id);
@@ -91,13 +95,20 @@ namespace Project.Controllers
             ViewBag.DiscountId = new List<SelectListItem>();
             foreach (var discount in list)
             {
-                ViewBag.DiscountId.Add(new SelectListItem { Value = discount.Id.ToString(), Text = discount.Description + discount.Amount});
+                ViewBag.DiscountId.Add(new SelectListItem { Value = discount.Id.ToString(), Text = discount.Description + discount.Amount });
+            }
+
+            var catList = _context.InventoryItemCategories.ToList();
+            ViewBag.CategoryId = new List<SelectListItem>();
+            foreach (var cat in catList)
+            {
+                ViewBag.DiscountId.Add(new SelectListItem { Value = cat.Id.ToString(), Text = cat.Name });
             }
             return View(item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int Id, string Name, decimal Price, string Description, string ImgPath, int Stock, int DiscountId)
+        public async Task<IActionResult> Edit(int Id, string Name, decimal Price, string Description, string ImgPath, int Stock, int DiscountId, int CategoryId)
         {
             var item = await _context.InventoryItems.SingleOrDefaultAsync(i => i.Id == Id);
             item.Name = Name;
@@ -105,15 +116,26 @@ namespace Project.Controllers
             item.Description = Description;
             item.ImgPath = ImgPath;
             item.Stock = Stock;
-            //item.DiscountId = DiscountId;
+            item.CategoryId = CategoryId;
+            //var connection = new MM_InventoryItem_Category();
+            //connection.InventoryItemId = Id;
+            //connection.CategoryId = CategoryId;
+            //var toDelete = await _context.MmInventoryItemCategories.SingleOrDefaultAsync(i => i.InventoryItemId == Id);
+            //_context.MmInventoryItemCategories.Remove(toDelete);
+            //_context.MmInventoryItemCategories.Add(connection);
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
 
         public IActionResult WriteReview(int id)
         {
+            //Gets user ID
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //checks if user has bought that item before
+            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
+            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
+            ViewBag.BoughtItem = boughtItems.Contains(id);
             return View();
         }
     }
