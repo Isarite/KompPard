@@ -152,9 +152,11 @@ namespace Project.Controllers
         public async Task<IActionResult> ActiveServices()
         {
             var user = await _userManger.GetUserAsync(User);
-            var services = _context.OrderedServiceItems.Include(c => c.Cart).Include(c => c.ServiceItem).Where(si => si.Cart.UserId == user.Id)
-                .Where(si => si.EndDate < DateTime.Now && si.StartDate > DateTime.Now);
-            return View(services);
+            var services = _context.OrderedServiceItems.Include(c => c.Cart).Include(c => c.ServiceItem);
+            var s1 = services
+                .Where(si => si.Cart.UserId == user.Id);
+            var s2 = s1.Where(si => si.EndDate > DateTime.Now && si.StartDate < DateTime.Now);
+            return View(s2);
         }
     }
 }

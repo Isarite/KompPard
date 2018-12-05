@@ -49,7 +49,7 @@ namespace Project.Controllers
             }
 
             // Try to obtain the item, if was previously requested, only to change number of items ordered.
-            var item = await _context.OrderedInventoryItems.SingleOrDefaultAsync(s => s.ItemId == id);
+            var item = await _context.OrderedInventoryItems.SingleOrDefaultAsync(s => s.ItemId == id && s.CartId == cart.Id);
             if (item == null)
                 await _context.OrderedInventoryItems.AddAsync(new OrderedInventoryItem
                 {
@@ -63,6 +63,7 @@ namespace Project.Controllers
             await _context.SaveChangesAsync();
             // Recalculates the cart price once.
             cart.TotalValue = await CalculatePrice(cart);
+            cart.LastEditDate = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -99,7 +100,7 @@ namespace Project.Controllers
                 PaymentDate = DateTime.Now,
                 PhoneNumber = phonenr
             };
-            
+
             var cc = new CreditCart { Cvc = cccvc, CardNo = ccnumber, ExprirationDate = ccexp, FullName = ccname };
             switch (BankSystemApi.WithdrawFunds(cc, cart.TotalValue))
             {
@@ -113,7 +114,15 @@ namespace Project.Controllers
                     throw new ArgumentOutOfRangeException();
             }
             // Good
+
             cart.IsFinal = true;
+            // Give 2 years warranty
+            await _context.OrderedServiceItems.AddAsync(new OrderedServiceItem {
+                CartId = cart.Id,
+                ServiceId = _context.ServiceItems.Single(s => s.Name == "Warranty").Id,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddYears(2)
+            });
             await _context.Invoices.AddAsync(invoice);
             await _context.SaveChangesAsync();
 
@@ -193,6 +202,7 @@ namespace Project.Controllers
                 }
                 _context.SaveChanges();
                 cartItem.Cart.TotalValue = await CalculatePrice(cartItem.Cart);
+                cartItem.Cart.LastEditDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
             }
