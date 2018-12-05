@@ -23,7 +23,7 @@ namespace Project.Controllers
         // GET: ServiceItems
         public async Task<IActionResult> Index()
         {
-            return View(await _context.ServiceItems.ToListAsync());
+            return View(await _context.ServiceItems.Where(n => n.Name != "Warranty").ToListAsync());
         }
 
         // GET: ServiceItems/Details/5
