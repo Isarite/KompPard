@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
@@ -25,7 +23,7 @@ namespace Project.Controllers
         // GET: ServiceItems
         public async Task<IActionResult> Index()
         {
-            return View(await _context.ServiceItems.ToListAsync());
+            return View(await _context.ServiceItems.Where(n => n.Name != "Warranty").ToListAsync());
         }
 
         // GET: ServiceItems/Details/5
@@ -109,10 +107,8 @@ namespace Project.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -156,9 +152,11 @@ namespace Project.Controllers
         public async Task<IActionResult> ActiveServices()
         {
             var user = await _userManger.GetUserAsync(User);
-            var services = _context.OrderedServiceItems.Include(c => c.Cart).Include(c => c.ServiceItem).Where(si => si.Cart.UserId == user.Id)
-                .Where(si => si.EndDate < DateTime.Now && si.StartDate > DateTime.Now);
-            return View(services);
+            var services = _context.OrderedServiceItems.Include(c => c.Cart).Include(c => c.ServiceItem);
+            var s1 = services
+                .Where(si => si.Cart.UserId == user.Id);
+            var s2 = s1.Where(si => si.EndDate > DateTime.Now && si.StartDate < DateTime.Now);
+            return View(s2);
         }
     }
 }

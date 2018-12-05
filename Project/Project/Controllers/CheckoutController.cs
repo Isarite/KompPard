@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Project.API;
 using Project.Data;
 using Project.Models;
-using Project.ViewModels;
+using Project.Services;
 
 namespace Project.Controllers
 {
@@ -49,7 +51,7 @@ namespace Project.Controllers
             }
 
             // Try to obtain the item, if was previously requested, only to change number of items ordered.
-            var item = await _context.OrderedInventoryItems.SingleOrDefaultAsync(s => s.ItemId == id);
+            var item = await _context.OrderedInventoryItems.SingleOrDefaultAsync(s => s.ItemId == id && s.CartId == cart.Id);
             if (item == null)
                 await _context.OrderedInventoryItems.AddAsync(new OrderedInventoryItem
                 {
@@ -63,6 +65,7 @@ namespace Project.Controllers
             await _context.SaveChangesAsync();
             // Recalculates the cart price once.
             cart.TotalValue = await CalculatePrice(cart);
+            cart.LastEditDate = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
@@ -79,6 +82,75 @@ namespace Project.Controllers
                 .SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
 
             return View(new Invoice { Cart = cart });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Continue(string phonenr, string address, string email, string ccname, string ccnumber, string ccexp, string cccvc)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var cart = await _context.Carts
+                .Include(c => c.OrderedInventoryItems)
+                .ThenInclude(i => i.InventoryItem)
+                .SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
+            var invoice = new Invoice
+            {
+                Cart = cart,
+                CreationDate = DateTime.Now,
+                DeliveryAddress = address,
+                Email = email,
+                Id = Guid.NewGuid(),
+                PaymentDate = DateTime.Now,
+                PhoneNumber = phonenr
+            };
+
+            var cc = new CreditCart { Cvc = cccvc, CardNo = ccnumber, ExprirationDate = ccexp, FullName = ccname };
+            switch (BankSystemApi.WithdrawFunds(cc, cart.TotalValue))
+            {
+                case BankResponse.Ok:
+                    break;
+                case BankResponse.Invalid:
+                    return View(new Invoice { Cart = cart });
+                case BankResponse.NoMoney:
+                    return View(new Invoice { Cart = cart });
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            // Good
+
+            cart.IsFinal = true;
+            // Give 2 years warranty
+            await _context.OrderedServiceItems.AddAsync(new OrderedServiceItem {
+                CartId = cart.Id,
+                ServiceId = _context.ServiceItems.Single(s => s.Name == "Warranty").Id,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddYears(2)
+            });
+            await _context.Invoices.AddAsync(invoice);
+            await _context.SaveChangesAsync();
+
+            SendEmail(invoice);
+
+            return RedirectToAction("Index");
+        }
+
+        public void SendEmail(Invoice invoice)
+        {
+            var subject = new StringBuilder();
+            subject.Append("Your order has been confirmed. A sales representitive will contact you shortly.\nCart contents:\n");
+            var inventory = _context.OrderedInventoryItems.Include(i => i.InventoryItem).Where(i => i.CartId == invoice.Cart.Id);
+            var services = _context.OrderedServiceItems.Include(i => i.ServiceItem).Where(i => i.CartId == invoice.Cart.Id);
+            foreach (var item in inventory)
+            {
+                subject.Append($"{item.InventoryItem.Name} x{item.Quantity} for {item.InventoryItem.Price} each\n");
+            }
+
+            foreach (var item in services)
+            {
+                subject.Append($"{item.ServiceItem.Name} for until {item.EndDate}\n");
+            }
+
+            subject.Append($"Total sum of all items is {invoice.Cart.TotalValue}\n");
+            EmailSender.SendEmail(invoice.Email, "Thank you for the purchase", subject.ToString());
         }
 
         public async Task<IActionResult> History()
@@ -154,6 +226,7 @@ namespace Project.Controllers
                 }
                 _context.SaveChanges();
                 cartItem.Cart.TotalValue = await CalculatePrice(cartItem.Cart);
+                cartItem.Cart.LastEditDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
             }

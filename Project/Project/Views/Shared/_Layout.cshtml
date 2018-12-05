@@ -15,31 +15,27 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navdata">
-            <div class="mr-auto">
-                <ul class="nav navbar-nav">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="Index">Inventory</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Services" asp-action="Index">Services</a></li>
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a></li>
-                    }
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListDiscounts">Discounts</a></li>
-                    }
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListCategories">Categories</a></li>
-                    }
-                </ul>
-            </div>
+            <ul class="nav navbar-nav">
+                <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="Index">Inventory</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Services" asp-action="Index">Services</a></li>
+                @if (User.IsInRole("Manager"))
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListDiscounts">Discounts</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListCategories">Categories</a></li>
+                }
+                <li>
+                    <form class="form-inline">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="text" placeholder="Search Products" />
+                            <div class="input-group-append">
+                                <input type="submit" class="btn btn-outline-primary" value="Search" />
+                            </div>
+                        </div>
+                    </form>
+                </li>
+            </ul>
             <div class="ml-auto">
-                <form asp-controller="Inventory" asp-action="Index">
-                    <p>
-                        <input type="text" name="text">
-                        <input type="submit" value="Ieškoti" />
-                    </p>
-                </form>
                 <partial name="_LoginPartial" />
             </div>
         </div>
