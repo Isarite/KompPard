@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Project.Models
+﻿namespace Project.Models
 {
     public class ServiceItem
     {

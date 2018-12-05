@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Project.API;
 using Project.Data;
 using Project.Models;
-using Project.ViewModels;
 
 namespace Project.Controllers
 {
@@ -82,10 +82,42 @@ namespace Project.Controllers
         }
 
         [HttpPost]
-        public IActionResult Continue(string phonenr, string address, string email, string ccname, string ccnumber, string ccexp, string cccvc)
+        public async Task<IActionResult> Continue(string phonenr, string address, string email, string ccname, string ccnumber, string ccexp, string cccvc)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var cart = await _context.Carts
+                .Include(c => c.OrderedInventoryItems)
+                .ThenInclude(i => i.InventoryItem)
+                .SingleOrDefaultAsync(c => c.UserId == user.Id && !c.IsFinal);
+            var invoice = new Invoice
+            {
+                Cart = cart,
+                CreationDate = DateTime.Now,
+                DeliveryAddress = address,
+                Email = email,
+                Id = Guid.NewGuid(),
+                PaymentDate = DateTime.Now,
+                PhoneNumber = phonenr
+            };
+            
+            var cc = new CreditCart { Cvc = cccvc, CardNo = ccnumber, ExprirationDate = ccexp, FullName = ccname };
+            switch (BankSystemApi.WithdrawFunds(cc, cart.TotalValue))
+            {
+                case BankResponse.Ok:
+                    break;
+                case BankResponse.Invalid:
+                    return View(new Invoice { Cart = cart });
+                case BankResponse.NoMoney:
+                    return View(new Invoice { Cart = cart });
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            // Good
+            cart.IsFinal = true;
+            await _context.Invoices.AddAsync(invoice);
+            await _context.SaveChangesAsync();
 
-            return View();
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> History()

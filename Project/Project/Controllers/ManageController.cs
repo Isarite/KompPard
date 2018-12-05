@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +30,7 @@ namespace Project.Controllers
         {
             if (email == null)
                 return View(await _userManager.GetUserAsync(User));
-            var user = (ApplicationUser)await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
             if (await IsAuthorized(await _userManager.GetUserAsync(User), user))
                 return View(user);
 
