@@ -21,6 +21,6 @@ namespace Project.Models
 
     public enum ReportType
     {
-        Clients = 0, Profits = 1, MostPopularServices = 2, MostPopilarGoods = 3
+        Clients = 0, Profits = 1, MostPopularServices = 2, MostPopularGoods = 3, AllOrders = 4, ActiveOrders = 5
     }
 }
