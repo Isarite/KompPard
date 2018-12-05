@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Project.Services;
 using Project.ViewModels;
 
 namespace Project.Controllers
@@ -8,6 +9,7 @@ namespace Project.Controllers
     {
         public IActionResult Index()
         {
+            EmailSender.SendEmail("gediminasmilasius@gmail.com", "Test1", "Test2");
             return View();
         }
 
