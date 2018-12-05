@@ -114,7 +114,15 @@ namespace Project.Controllers
             var boughtItems = _context.OrderedInventoryItems.Where(c => carts.Contains(c.CartId)).Select(c => c.ItemId);
             ViewBag.BoughtItem = boughtItems.Contains(id);
             var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id);
-            ViewBag.discount = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
+            var discount = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
+            if(discount == null)
+            {
+                ViewBag.DiscountAmount = 0;
+            }
+            else
+            {
+                ViewBag.DiscountAmount = discount.Amount;
+            }
 
             return View(item);
         }
@@ -170,7 +178,7 @@ namespace Project.Controllers
             ViewBag.CategoryId = new List<SelectListItem>();
             foreach (var cat in catList)
             {
-                ViewBag.DiscountId.Add(new SelectListItem { Value = cat.Id.ToString(), Text = cat.Name });
+                ViewBag.CategoryId.Add(new SelectListItem { Value = cat.Id.ToString(), Text = cat.Name });
             }
             return View(item);
         }

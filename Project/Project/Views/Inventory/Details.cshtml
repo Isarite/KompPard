@@ -43,15 +43,15 @@
         <dd>
             @Html.DisplayFor(model => model.Rating)
         </dd>
+        @if(ViewBag.DiscountAmount!=0)
+        {
         <dt>
             @Html.DisplayNameFor(model => model.Discount)
         </dt>
         <dd>
-            @ViewBag.discount.Amount %
+            @ViewBag.DiscountAmount %
         </dd>
-        <dd>
-            @ViewBag.discount.Description 
-        </dd>
+        }
     </dl>
 </div>
 <div>
