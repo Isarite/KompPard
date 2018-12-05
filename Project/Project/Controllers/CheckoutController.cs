@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.API;
 using Project.Data;
 using Project.Models;
+using Project.Services;
 
 namespace Project.Controllers
 {
@@ -126,7 +128,29 @@ namespace Project.Controllers
             await _context.Invoices.AddAsync(invoice);
             await _context.SaveChangesAsync();
 
+            SendEmail(invoice);
+
             return RedirectToAction("Index");
+        }
+
+        public void SendEmail(Invoice invoice)
+        {
+            var subject = new StringBuilder();
+            subject.Append("Your order has been confirmed. A sales representitive will contact you shortly.\nCart contents:\n");
+            var inventory = _context.OrderedInventoryItems.Include(i => i.InventoryItem).Where(i => i.CartId == invoice.Cart.Id);
+            var services = _context.OrderedServiceItems.Include(i => i.ServiceItem).Where(i => i.CartId == invoice.Cart.Id);
+            foreach (var item in inventory)
+            {
+                subject.Append($"{item.InventoryItem.Name} x{item.Quantity} for {item.InventoryItem.Price} each\n");
+            }
+
+            foreach (var item in services)
+            {
+                subject.Append($"{item.ServiceItem.Name} for until {item.EndDate}\n");
+            }
+
+            subject.Append($"Total sum of all items is {invoice.Cart.TotalValue}\n");
+            EmailSender.SendEmail(invoice.Email, "Thank you for the purchase", subject.ToString());
         }
 
         public async Task<IActionResult> History()

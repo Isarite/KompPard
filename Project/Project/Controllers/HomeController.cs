@@ -9,7 +9,6 @@ namespace Project.Controllers
     {
         public IActionResult Index()
         {
-            EmailSender.SendEmail("gediminasmilasius@gmail.com", "Test1", "Test2");
             return View();
         }
 
