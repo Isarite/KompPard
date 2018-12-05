@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project.Data;
 using Project.Models;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Project.Controllers
 {
@@ -54,8 +50,6 @@ namespace Project.Controllers
             return View();
         }
 
-
-
         public IActionResult CreateCategory()
         {
             if (!User.IsInRole("Manager"))
@@ -74,14 +68,14 @@ namespace Project.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AssignDiscounts(int DiscountId, IEnumerable<int> confirmation)
+        public async Task<IActionResult> AssignDiscounts(int discountId, IEnumerable<int> confirmation)
         {
             if (!User.IsInRole("Manager"))
                 RedirectToAction(nameof(Index));
             var items = _context.InventoryItems.Where(c => confirmation.Contains(c.Id));
             foreach(var item in items)
             {
-                item.DiscountId = DiscountId;
+                item.DiscountId = discountId;
             }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(ListDiscounts));
@@ -116,8 +110,8 @@ namespace Project.Controllers
             //Gets user ID
             var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
             //checks if user has bought that item before
-            var Carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
-            var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
+            var carts = _context.Carts.Where(c => c.UserId.Equals(identity) && c.IsFinal).Select(c => c.Id);
+            var boughtItems = _context.OrderedInventoryItems.Where(c => carts.Contains(c.CartId)).Select(c => c.ItemId);
             ViewBag.BoughtItem = boughtItems.Contains(id);
             var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == id);
             ViewBag.discount = await _context.Discounts.SingleOrDefaultAsync(d => d.Id == item.DiscountId);
