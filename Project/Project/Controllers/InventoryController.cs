@@ -64,7 +64,7 @@ namespace Project.Controllers
                 RedirectToAction(nameof(Index));
             await _context.Discounts.AddAsync(item);
             await _context.SaveChangesAsync();
-            return View(nameof(ListDiscounts));
+            return RedirectToAction(nameof(ListDiscounts));
         }
 
         [HttpPost]
@@ -88,7 +88,7 @@ namespace Project.Controllers
                 RedirectToAction(nameof(Index));
             await _context.InventoryItemCategories.AddAsync(item);
             await _context.SaveChangesAsync();
-            return View(nameof(ListCategories));
+            return RedirectToAction(nameof(ListCategories));
         }
 
         [HttpPost]
@@ -147,8 +147,8 @@ namespace Project.Controllers
 
         public async Task<IActionResult> ListCategories()
         {
-            if (!User.IsInRole("Manager"))
-                RedirectToAction(nameof(Index));
+            //if (!User.IsInRole("Manager"))
+            //    RedirectToAction(nameof(Index));
 
             return View(await _context.InventoryItemCategories.ToListAsync());
         }
