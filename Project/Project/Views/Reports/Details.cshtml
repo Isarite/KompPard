@@ -31,14 +31,14 @@
 
             <dt> Most popular services report</dt>
 
-            <dd> List of services that have been ordered the most times between StartDate and EndDate. </dd>
+            <dd> Information about the service that has been ordered the most times between StartDate and EndDate. </dd>
         }
         @if (@Model.Type.ToString().Equals("MostPopularGoods"))
         {
 
             <dt> Most popular goods report </dt>
 
-            <dd>List of goods that have been bought the most times between StartDate and EndDate. </dd>
+            <dd>Information about the good that has been ordered the most times between StartDate and EndDate. </dd>
         }
         @if (@Model.Type.ToString().Equals("AllOrders"))
         {
@@ -47,14 +47,14 @@
                 Pending orders report 
             </dt>
 
-            <dd>List of orders that have been placed between StartDate and EndDate. </dd>
+            <dd>List of orders that were placed between StartDate and EndDate. </dd>
         }
         @if (@Model.Type.ToString().Equals("ActiveOrders"))
         {
 
             <dt> Active orders report </dt>
 
-            <dd>List of orders that were carried out between StartDate and EndDate  </dd>
+            <dd>List of currently active orders  </dd>
         }
         <dt>
             StartDate:
