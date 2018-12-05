@@ -25,11 +25,11 @@
                     <li class="nav-item"><a class="nav-link" asp-controller="Inventory" asp-action="ListCategories">Categories</a></li>
                 }
                 <li>
-                    <form class="form-inline">
+                    <form class="form-inline" asp-controller="Inventory" asp-action="Index">
                         <div class="input-group">
-                            <input type="text" class="form-control" name="text" placeholder="Search Products" />
+                            <input type="text" class="form-control" name="text" placeholder="Search Products" asp-controller="Inventory" asp-action="Index"  />
                             <div class="input-group-append">
-                                <input type="submit" class="btn btn-outline-primary" value="Search" />
+                                <input type="submit" class="btn btn-outline-primary" value="Search" asp-controller="Inventory" asp-action="Index" />
                             </div>
                         </div>
                     </form>
