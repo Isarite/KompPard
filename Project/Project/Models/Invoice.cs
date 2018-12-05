@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Project.Models
 {
@@ -13,8 +11,14 @@ namespace Project.Models
 
         public DateTime CreationDate { get; set; }
         public DateTime? PaymentDate { get; set; }
+
+        [Required(ErrorMessage = "Please enter an address for delivery")]
         public string DeliveryAddress { get; set; }
+
+        [Required(ErrorMessage = "Please provide an email")]
         public string Email { get; set; }
+
+        [Required(ErrorMessage = "Please input a phone number")]
         public string PhoneNumber { get; set; }
 
         public virtual Cart Cart { get; set; }

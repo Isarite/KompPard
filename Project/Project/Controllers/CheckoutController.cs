@@ -81,6 +81,13 @@ namespace Project.Controllers
             return View(new Invoice { Cart = cart });
         }
 
+        [HttpPost]
+        public IActionResult Continue(string phonenr, string address, string email, string ccname, string ccnumber, string ccexp, string cccvc)
+        {
+
+            return View();
+        }
+
         public async Task<IActionResult> History()
         {
             var uid = _userManager.GetUserId(User);
