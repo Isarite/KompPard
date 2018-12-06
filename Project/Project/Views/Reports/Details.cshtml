@@ -44,7 +44,7 @@
         {
 
             <dt>
-                Pending orders report 
+                All orders report
             </dt>
 
             <dd>List of orders that were placed between StartDate and EndDate. </dd>
@@ -69,14 +69,12 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt> Creator: </dt>
-        <dt>
-            @Html.DisplayFor(model => model.Creator)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CreatorId)
-        </dd>
+
+        <dd>@Html.DisplayFor(model => model.Creator.UserName)</dd>
+        <dd>@Html.DisplayFor(model => model.Creator.Id)</dd>
     </dl>
 </div>
-<div class="container">
-    @Model.ContentsHtml
+<div style="white-space: pre-line;">
+
+    <h4>Report data</h4><hr/>@Model.ContentsHtml
 </div>

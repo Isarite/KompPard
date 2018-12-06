@@ -39,20 +39,23 @@ namespace Project.Controllers
             {
                 return NotFound();
             }
-            
-            //priklausomai nuo to, koks ataskaitos tipas, reikai suformuoti teksto eilutę su kažkokia "ataskaitos" informacija
-            if(report.Type.ToString() == "Clients")
+
+            //priklausomai nuo to, koks ataskaitos tipas, reikia suformuoti teksto eilutę su kažkokia "ataskaitos" informacija
+            if (report.Type.ToString() == "Clients")
             {
+                report.ContentsHtml = "";
                 foreach (var item in _context.Users)
                 {
-                    if (item.RegisterDate < report.EndTime && item.RegisterDate > report.StartTime)
+                    if (item.RegisterDate.CompareTo(report.EndTime) == -1 && item.RegisterDate.CompareTo(report.StartTime) == 1)
                     {
-                        report.ContentsHtml.Insert(report.ContentsHtml.Length, item.UserName + " " + item.Email + " " + item.RegisterDate + " \n");
+                        report.ContentsHtml += item.FirstName + " " + item.LastName + System.Environment.NewLine
+                                            + item.Email + System.Environment.NewLine
+                                            + item.RegisterDate + System.Environment.NewLine + System.Environment.NewLine;
                     }
                 }
-                if(report.ContentsHtml.Length < 10)
+                if (report.ContentsHtml.Length < 10)
                 {
-                    report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period \n";
+                    report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period" + System.Environment.NewLine;
                 }
             }
             if (report.Type.ToString() == "Profits")
@@ -60,7 +63,7 @@ namespace Project.Controllers
                 decimal sum = 0;
                 foreach (var item in _context.Carts)
                 {
-                    if (item.IsFinal && item.LastEditDate > report.StartTime && item.LastEditDate < report.EndTime)
+                    if (item.IsFinal && item.LastEditDate.CompareTo(report.StartTime) == 1 && item.LastEditDate.CompareTo(report.EndTime) == -1)
                     {
                         sum += item.TotalValue;
                     }
@@ -74,31 +77,29 @@ namespace Project.Controllers
             if (report.Type.ToString() == "MostPopularServices")
             {
                 int[] serv = new int[100];//Nežinau, iki kiek eina serviceid
-                string[] names = new string[100];
                 for (int i = 0; i < serv.Length; i++)
                 { serv[i] = 0; }
                 int maxid = 0;
                 int maxnum = 0;
-                string maxname = " ";
 
                 foreach (var item in _context.OrderedServiceItems)
                 {
-                    if (item.StartDate > report.StartTime && item.EndDate < report.EndTime)
+                    if (item.StartDate.CompareTo(report.StartTime) == 1 && item.EndDate.CompareTo(report.EndTime) == -1)
                     {
                         serv[item.ServiceId]++;
-                        names[item.ServiceId] = item.ServiceItem.Name;
                     }
                 }
                 for (int i = 0; i < serv.Length; i++)
                 {
-                    if(serv[i] != 0 && serv[i] > maxnum)
+                    if (serv[i] != 0 && serv[i] > maxnum)
                     {
                         maxnum = serv[i];
                         maxid = i;
-                        maxname = names[i];
                     }
                 }
-                report.ContentsHtml = "Most popular service during the selected time period:   ID= " + maxid + "   Name = " + maxname + "   Was ordered " + maxnum + " times \n";
+                report.ContentsHtml = "Most popular service during the selected time period:   " +
+                                    "ID= " + maxid + System.Environment.NewLine +
+                                    "Times ordered = " + maxnum + System.Environment.NewLine + System.Environment.NewLine;
                 if (maxnum == 0)
                 {
                     report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period \n";
@@ -109,7 +110,6 @@ namespace Project.Controllers
             if (report.Type.ToString() == "MostPopularGoods")
             {
                 int[] good = new int[100];//Nežinau, iki kiek eina id
-                string[] names = new string[100];
                 for (int i = 0; i < good.Length; i++)
                 { good[i] = 0; }
                 int maxid = 0;
@@ -118,12 +118,11 @@ namespace Project.Controllers
 
                 foreach (var item in _context.Carts)
                 {
-                    if (item.IsFinal && item.LastEditDate > report.StartTime && item.LastEditDate < report.EndTime)
+                    if (item.IsFinal && item.LastEditDate.CompareTo(report.StartTime) == 1 && item.LastEditDate.CompareTo(report.EndTime) == -1)
                     {
                         foreach (var item2 in item.OrderedInventoryItems)
                         {
                             good[item2.ItemId]++;
-                            names[item2.ItemId] = item2.InventoryItem.Name;
                         }
 
                     }
@@ -134,10 +133,11 @@ namespace Project.Controllers
                     {
                         maxnum = good[i];
                         maxid = i;
-                        maxname = names[i];
                     }
                 }
-                report.ContentsHtml = "Most popular goods during the selected time period:   ID= " + maxid + "   Name = " + maxname + "   Was ordered " + maxnum + " times \n";
+                report.ContentsHtml = "Most popular good during the selected time period:   " +
+                                   "ID= " + maxid + System.Environment.NewLine +
+                                   "Times ordered = " + maxnum + System.Environment.NewLine + System.Environment.NewLine;
                 if (maxnum == 0)
                 {
                     report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period \n";
@@ -148,34 +148,42 @@ namespace Project.Controllers
             {
                 foreach (var item in _context.Carts)
                 {
-                    if (item.IsFinal && item.LastEditDate > report.StartTime && item.LastEditDate < report.EndTime)
+                    //report.ContentsHtml = item.IsFinal + " " +item.LastEditDate + " " + report.StartTime + " " + report.EndTime + " " + item.LastEditDate.CompareTo(report.StartTime) + " " + item.LastEditDate.CompareTo(report.EndTime); 
+                    if (item.IsFinal && item.LastEditDate.CompareTo(report.StartTime) == 1 && item.LastEditDate.CompareTo(report.EndTime) == -1)
                     {
-                        report.ContentsHtml.Insert(report.ContentsHtml.Length, "Order ID = " + item.Id + " Order Sum = " + item.TotalValue + " Placement date = " + item.LastEditDate + " Client = " + item.User + "\n");
+                        report.ContentsHtml += "Order ID = " + item.Id + System.Environment.NewLine
+                                                + " Order Sum = " + item.TotalValue + System.Environment.NewLine
+                                                + " Placement date = " + item.LastEditDate + System.Environment.NewLine
+                                                + " Client = " + item.UserId + System.Environment.NewLine + System.Environment.NewLine;
                     }
                 }
 
+                /*
                 if (report.ContentsHtml.Length < 10)
                 {
-                    report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period \n aaa";
+                    report.ContentsHtml = "The selected time period does not have enough data to create a report, try to select a wider time period \n";
                 }
+                */
             }
 
             if (report.Type.ToString() == "ActiveOrders")
             {
+                report.ContentsHtml = "";
                 foreach (var item in _context.Carts)
                 {
-                    if (item.IsFinal && item.LastEditDate.AddDays(7) > DateTime.Today) // Laikoma, kad užsakymai aktyvūs 7 dienas
+                    if (item.IsFinal && item.LastEditDate.AddDays(7).CompareTo(DateTime.Today) == 1) // Laikoma, kad užsakymai aktyvūs 7 dienas
                     {
-                        report.ContentsHtml.Insert(report.ContentsHtml.Length, "Order ID = " + item.Id + " Order Sum = " + item.TotalValue + " Placement date = " + item.LastEditDate + " Client = " + item.User + "\n");
+                        report.ContentsHtml += "Order ID = " + item.Id + System.Environment.NewLine
+                                             + " Order Sum = " + item.TotalValue + System.Environment.NewLine
+                                             + " Placement date = " + item.LastEditDate + System.Environment.NewLine
+                                             + " Client = " + item.User + System.Environment.NewLine + System.Environment.NewLine;
                     }
                 }
-
                 if (report.ContentsHtml.Length < 10)
                 {
                     report.ContentsHtml = "There are no active orders at this time \n";
-                }
+                }                       
             }
-
             return View(report);
         }
 
