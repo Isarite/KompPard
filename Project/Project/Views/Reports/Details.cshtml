@@ -4,10 +4,77 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
+<div align="right">
     <a asp-action="Index">Back to List</a>
 </div>
+<div>
+    <h4>Report details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @if (@Model.Type.ToString().Equals("Clients"))
+        {
 
-<div class="container">
-    @Model.ContentsHtml
+            <dt>Clients report</dt>
+
+            <dd> List of clients registered between StartDate and EndDate. </dd>
+
+        }
+        @if (@Model.Type.ToString().Equals("Profits"))
+        {
+
+            <dt>Profits report</dt>
+
+            <dd> Total profits earned between StartDate and EndDate. </dd>
+        }
+        @if (@Model.Type.ToString().Equals("MostPopularServices"))
+        {
+
+            <dt> Most popular services report</dt>
+
+            <dd> Information about the service that has been ordered the most times between StartDate and EndDate. </dd>
+        }
+        @if (@Model.Type.ToString().Equals("MostPopularGoods"))
+        {
+
+            <dt> Most popular goods report </dt>
+
+            <dd>Information about the good that has been ordered the most times between StartDate and EndDate. </dd>
+        }
+        @if (@Model.Type.ToString().Equals("AllOrders"))
+        {
+
+            <dt>
+                All orders report
+            </dt>
+
+            <dd>List of orders that were placed between StartDate and EndDate. </dd>
+        }
+        @if (@Model.Type.ToString().Equals("ActiveOrders"))
+        {
+
+            <dt> Active orders report </dt>
+
+            <dd>List of currently active orders  </dd>
+        }
+        <dt>
+            StartDate:
+            @Html.DisplayFor(model => model.StartTime)
+        </dt>
+        <dt>
+            EndDate:
+            @Html.DisplayFor(model => model.EndTime)
+        </dt>
+        <dt> Description:</dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt> Creator: </dt>
+
+        <dd>@Html.DisplayFor(model => model.Creator.UserName)</dd>
+        <dd>@Html.DisplayFor(model => model.Creator.Id)</dd>
+    </dl>
+</div>
+<div style="white-space: pre-line;">
+
+    <h4>Report data</h4><hr/>@Model.ContentsHtml
 </div>
