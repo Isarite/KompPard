@@ -114,15 +114,17 @@ namespace Project.Controllers
                 { good[i] = 0; }
                 int maxid = 0;
                 int maxnum = 0;
-                string maxname = "";
 
                 foreach (var item in _context.Carts)
                 {
                     if (item.IsFinal && item.LastEditDate.CompareTo(report.StartTime) == 1 && item.LastEditDate.CompareTo(report.EndTime) == -1)
                     {
-                        foreach (var item2 in item.OrderedInventoryItems)
+                        foreach (var item2 in _context.OrderedInventoryItems)
                         {
-                            good[item2.ItemId]++;
+                            if (item2.CartId == item.Id)
+                            {
+                                good[item2.ItemId]++;
+                            }
                         }
 
                     }
