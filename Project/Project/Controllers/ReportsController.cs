@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -39,6 +40,17 @@ namespace Project.Controllers
             {
                 return NotFound();
             }
+
+            var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            report.CreatorId = identity;
+            foreach (var item in _context.Users)
+            {
+                if (item.Id == identity)
+                {
+                    report.Creator = item;
+                }
+            }
+                
 
             //priklausomai nuo to, koks ataskaitos tipas, reikia suformuoti teksto eilutę su kažkokia "ataskaitos" informacija
             if (report.Type.ToString() == "Clients")
@@ -206,6 +218,17 @@ namespace Project.Controllers
             if (ModelState.IsValid)
             {
                 report.Id = Guid.NewGuid();
+
+                var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                report.CreatorId = identity;
+                foreach (var item in _context.Users)
+                {
+                    if (item.Id == identity)
+                    {
+                        report.Creator = item;
+                    }
+                }
+
                 _context.Add(report);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
