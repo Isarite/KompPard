@@ -33,5 +33,6 @@ namespace Project.ViewModels
         public int CountryId { get; set; }
 
         public IEnumerable<Country> Countries { get; set; }
+        public bool Subscribed { get; set; }
     }
 }

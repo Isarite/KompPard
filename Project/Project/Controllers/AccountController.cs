@@ -56,7 +56,8 @@ namespace Project.Controllers
                 Email = model.Email,
                 CountryId = model.CountryId,
                 FirstName = model.FirstName,
-                LastName = model.LastName
+                LastName = model.LastName,
+                Subscribed = model.Subscribed
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
@@ -67,7 +68,7 @@ namespace Project.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return RedirectToAction(nameof(Register));
         }
 
         [HttpPost]
