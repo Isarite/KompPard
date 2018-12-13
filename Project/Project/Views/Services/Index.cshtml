@@ -1,4 +1,6 @@
-﻿@model IEnumerable<ServiceItem>
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<ServiceItem>
+@inject SignInManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Index";
@@ -11,7 +13,10 @@
 </style>
 
 <h2>Index</h2>
-<p><a asp-action="ActiveServices">Check active services</a></p>
+@if (UserManager.IsSignedIn(User))
+{
+    <p><a asp-action="ActiveServices">Check active services</a></p>
+}
 <p>
     <a asp-action="Create">Create New</a>
 </p>

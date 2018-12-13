@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -149,6 +150,7 @@ namespace Project.Controllers
             return _context.ServiceItems.Any(e => e.Id == id);
         }
 
+        [Authorize]
         public async Task<IActionResult> ActiveServices()
         {
             var user = await _userManger.GetUserAsync(User);
