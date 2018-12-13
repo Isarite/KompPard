@@ -214,7 +214,7 @@ namespace Project.Controllers
             var boughtItems = _context.OrderedInventoryItems.Where(c => Carts.Contains(c.CartId)).Select(c => c.ItemId);
             if(!boughtItems.Contains(id))
                 return RedirectToAction(nameof(Index));
-            ViewBag.id = id;
+            ViewBag.Id = id;
             ViewBag.UserId = identity;
             return View();
         }
