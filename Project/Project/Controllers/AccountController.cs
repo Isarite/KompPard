@@ -125,5 +125,10 @@ namespace Project.Controllers
         {
             return _userManager.GetUserId(User);
         }
+
+        public IActionResult AccessDenied()
+        {
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

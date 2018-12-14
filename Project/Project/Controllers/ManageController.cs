@@ -38,7 +38,7 @@ namespace Project.Controllers
             throw new NotImplementedException();
         }
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> All(string email)
         {
             var users = await _context.Users.ToListAsync();
