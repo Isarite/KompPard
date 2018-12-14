@@ -43,14 +43,14 @@
         <dd>
             @Html.DisplayFor(model => model.Rating)
         </dd>
-        @if(ViewBag.DiscountAmount!=0)
+        @if (ViewBag.DiscountAmount != 0)
         {
-        <dt>
-            @Html.DisplayNameFor(model => model.Discount)
-        </dt>
-        <dd>
-            @ViewBag.DiscountAmount %
-        </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Discount)
+            </dt>
+            <dd>
+                @ViewBag.DiscountAmount %
+            </dd>
         }
     </dl>
 </div>
@@ -69,11 +69,11 @@
     </form>
     <a asp-action="Index">Back to List</a>
 </div>
-    @if (User.IsInRole("Manager"))
-    {
-        <a href="@Url.Action("Edit")/@Model.Id">Edit</a>
-    }
-    @if (ViewBag.BoughtItem) {
+@if (User.IsInRole("Manager"))
+{
+    <a href="@Url.Action("Edit")/@Model.Id">Edit</a>
+}
+@if (ViewBag.BoughtItem && Model.Rating < 1)
+{
     <a href="@Url.Action("WriteReview")/@Model.Id">Write review</a>
-    }
-    </div>
+}

@@ -92,10 +92,11 @@ namespace Project.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> WriteReview(Feedback review)
+        public async Task<IActionResult> WriteReview(int id, Feedback review)
         {
             var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
             review.UserId = identity;
+            review.ItemId = id;
             await _context.Feedback.AddAsync(review);
             await _context.SaveChangesAsync();
             var item = await _context.InventoryItems.SingleOrDefaultAsync(d => d.Id == review.ItemId);
